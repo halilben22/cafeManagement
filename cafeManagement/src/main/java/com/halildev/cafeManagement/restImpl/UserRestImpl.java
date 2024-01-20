@@ -5,11 +5,15 @@ import com.halildev.cafeManagement.service.UserService;
 import com.halildev.cafeManagement.utils.CafeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 import static com.halildev.cafeManagement.constants.CafeConstants.SOMETHING_WENT_WRONG;
 
+
+
+@RestController
 public class UserRestImpl implements UserRest {
 
 
@@ -36,5 +40,10 @@ public class UserRestImpl implements UserRest {
         }
 
         return CafeUtils.getResponseEntity(SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> signIn() {
+        return ResponseEntity.ok("Buraya girdi");
     }
 }
