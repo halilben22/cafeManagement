@@ -24,11 +24,11 @@ public class SecurityConfig {
 
 
     private final CustomerUserDetailsService customerUserDetailsService;
-    private final PasswordEncoderConfig passwordEncoder;
+    private final PasswordEncoderConfigure passwordEncoder;
 
     private final JwtAuthFilter jwtAuthFilter;
 
-    public SecurityConfig(CustomerUserDetailsService customerUserDetailsService, PasswordEncoderConfig passwordEncoder, JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(CustomerUserDetailsService customerUserDetailsService, PasswordEncoderConfigure passwordEncoder, JwtAuthFilter jwtAuthFilter) {
         this.customerUserDetailsService = customerUserDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.jwtAuthFilter = jwtAuthFilter;
@@ -38,10 +38,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        System.out.println("wdwdwd");
+
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(x -> x
-                        .requestMatchers("/user/signin","/user/signup")
+                        .requestMatchers("/user/signin","/user/signup","/user/login")
                         .permitAll().anyRequest().authenticated())
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
@@ -55,8 +55,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(customerUserDetailsService)
-        ;
+        daoAuthenticationProvider.setUserDetailsService(customerUserDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder.passwordEncoder());
         return daoAuthenticationProvider;
 

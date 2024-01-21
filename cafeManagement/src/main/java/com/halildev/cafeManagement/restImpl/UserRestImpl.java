@@ -1,5 +1,6 @@
 package com.halildev.cafeManagement.restImpl;
 
+import com.halildev.cafeManagement.constants.CafeConstants;
 import com.halildev.cafeManagement.rest.UserRest;
 import com.halildev.cafeManagement.service.UserService;
 import com.halildev.cafeManagement.utils.CafeUtils;
@@ -12,13 +13,11 @@ import java.util.Map;
 import static com.halildev.cafeManagement.constants.CafeConstants.SOMETHING_WENT_WRONG;
 
 
-
 @RestController
 public class UserRestImpl implements UserRest {
 
 
-
-  private final   UserService userService;
+    private final UserService userService;
 
     public UserRestImpl(UserService userService) {
         this.userService = userService;
@@ -32,9 +31,7 @@ public class UserRestImpl implements UserRest {
 
             return userService.signUp(requestMap);
 
-        }
-
-        catch (Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
@@ -43,7 +40,17 @@ public class UserRestImpl implements UserRest {
     }
 
     @Override
-    public ResponseEntity<String> signIn() {
-        return ResponseEntity.ok("Buraya girdi");
+    public ResponseEntity<String> login(Map<String, String> requestMap) {
+
+
+        try {
+            return userService.login(requestMap);
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+
+        return CafeUtils.getResponseEntity(SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

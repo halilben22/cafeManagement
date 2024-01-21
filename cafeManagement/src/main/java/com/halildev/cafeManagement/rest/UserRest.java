@@ -14,8 +14,12 @@ public interface UserRest  {
     @PostMapping("/signup")
     ResponseEntity<String> signUp(@RequestBody() Map<String, String> requestMap);
 
-    @GetMapping("/signin")
-    ResponseEntity<String> signIn();
+
+
+
+    @PostMapping("/login")
+
+    ResponseEntity<String> login(@RequestBody Map<String,String> requestMap);
 
 
 }
