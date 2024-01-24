@@ -8,4 +8,5 @@ public class CafeConstants {
     public static final String EMAIL_ALREADY_EXISTS="Email already exists!";
     public static final String ADMIN_APPROVAL = "Wait for admin approval";
     public static final String BAD_CREDENTIALS ="Bad credentials!" ;
+    public static final String UNAUTHORIZED_REQUEST = "Unauthorized request!";
 }
