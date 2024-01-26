@@ -6,8 +6,9 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
+import java.util.List;
 
-@NamedQuery(name = "Category.getAllCategory",query = "select c from Category c")
+@NamedQuery(name = "Category.getAllCategory", query = "select c from Category c inner join Product p on c.id=p.category.id")
 
 @Data
 @Entity()
@@ -27,4 +28,7 @@ public class Category implements Serializable {
     private Long id;
     @Column(name = "name")
     private String name;
+
+
+
 }
