@@ -2,10 +2,7 @@ package com.halildev.cafeManagement.rest;
 
 import com.halildev.cafeManagement.wrapper.ProductWrapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -23,4 +20,19 @@ public interface ProductRest {
 
     @PostMapping("/update")
     ResponseEntity<String>updateProduct(@RequestBody Map<String,String> requestMap);
+
+
+     @PostMapping("/delete/{id}")
+    ResponseEntity<String> deleteProduct(@PathVariable Long id);
+
+     @PostMapping("/updateStatus")
+    ResponseEntity<String> updateStatus(@RequestBody Map<String,String> requestMap);
+
+     @GetMapping("/getByCategory/{id}")
+    ResponseEntity<List<ProductWrapper>>getByCategory(@PathVariable Long id);
+
+
+     @GetMapping("/getById/{id}")
+    ResponseEntity<ProductWrapper>getProductById(@PathVariable Long id );
+
 }

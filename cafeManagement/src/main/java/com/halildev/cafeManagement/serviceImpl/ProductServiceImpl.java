@@ -99,6 +99,85 @@ public class ProductServiceImpl implements ProductService {
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> deleteProduct(Long id) {
+
+        try {
+            if (jwtAuthFilter.isAdmin()) {
+                Optional<Product> optionalProduct = productDao.findById(id);
+
+                if (optionalProduct.isPresent()) {
+                    productDao.deleteById(id);
+                    return CafeUtils.getResponseEntity("Product deleted successfully!", HttpStatus.OK);
+
+                } else {
+                    return CafeUtils.getResponseEntity("Product id does not exist", HttpStatus.OK);
+                }
+            } else {
+                return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_REQUEST, HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+
+
+        }
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateStatus(Map<String, String> requestMap) {
+
+        try {
+            if (jwtAuthFilter.isAdmin()) {
+                Optional optional = productDao.findById(Long.parseLong(requestMap.get("id")));
+                if (optional.isPresent()) {
+
+                    productDao.updateProductStatus(requestMap.get("status"), Long.parseLong(requestMap.get("id")));
+                    return CafeUtils.getResponseEntity("Product status updated successfully!",HttpStatus.OK);
+                }
+
+                return CafeUtils.getResponseEntity("Product id does not exist", HttpStatus.OK);
+
+            } else {
+
+                return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_REQUEST, HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getByCategory(Long id) {
+        try {
+
+            return new ResponseEntity<>(productDao.getProductByCategory(id),HttpStatus.OK);
+        }
+
+        catch (Exception e){
+
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<ProductWrapper> getProductById(Long id) {
+
+        try {
+
+            return new ResponseEntity<>(productDao.getProductById(id),HttpStatus.OK);
+
+        }
+        catch (Exception e){
+
+
+        }
+        return new ResponseEntity<>(new ProductWrapper(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private Product getProductFromMap(Map<String, String> requestMap, boolean isAdd) {
         Category category = new Category();
 
