@@ -3,6 +3,7 @@ package com.halildev.cafeManagement.serviceImpl;
 import com.halildev.cafeManagement.constants.CafeConstants;
 import com.halildev.cafeManagement.dao.BillDao;
 import com.halildev.cafeManagement.pojo.Bill;
+import com.halildev.cafeManagement.rest.BillRest;
 import com.halildev.cafeManagement.security.JwtAuthFilter;
 import com.halildev.cafeManagement.service.BillService;
 import com.halildev.cafeManagement.utils.CafeUtils;
@@ -11,16 +12,20 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.io.IOUtils;
 import org.json.JSONArray;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.xml.parsers.DocumentBuilder;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.awt.Font.getFont;
@@ -39,7 +44,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public ResponseEntity<String> generateReport(Map<String, String> requestMap) {
+    public ResponseEntity<String> generateReport(Map<String, Object> requestMap) {
         log.info("Inside generateReport method");
 
 
@@ -49,7 +54,7 @@ public class BillServiceImpl implements BillService {
 
             if (validateRequestMap(requestMap)) {
 
-                if (requestMap.containsKey("isGenerate") && !Boolean.parseBoolean(requestMap.get("isGenerate"))) {
+                if (requestMap.containsKey("isGenerate") && !Boolean.parseBoolean((String) requestMap.get("isGenerate"))) {
 
 
                     fileName = (String) requestMap.get("uuid");
@@ -82,7 +87,7 @@ public class BillServiceImpl implements BillService {
                 PdfPTable table = new PdfPTable(5);
                 table.setWidthPercentage(100);
                 addTableHeader(table);
-                JSONArray jsonArray = CafeUtils.getJsonArrayFromString(requestMap.get("productDetails"));
+                JSONArray jsonArray = CafeUtils.getJsonArrayFromString((String) requestMap.get("productDetails"));
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     addRows(table, CafeUtils.getMapFromJson(jsonArray.getString(i)));
@@ -104,7 +109,7 @@ public class BillServiceImpl implements BillService {
 
         } catch (Exception e) {
 
-
+            e.printStackTrace();
         }
 
 
@@ -113,7 +118,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public ResponseEntity<List<Bill>> getBills() {
-        List<Bill> list = new ArrayList<>();
+        List<Bill> list;
 
         if (jwtAuthFilter.isAdmin()) {
             list = billDao.getAllBills();
@@ -124,7 +129,76 @@ public class BillServiceImpl implements BillService {
         }
 
 
-        return CafeUtils.getResponseEntityAsList(list,HttpStatus.OK);
+        return CafeUtils.getResponseEntityAsList(list, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getPdf(Map<String, Object> requestMap) {
+        log.info("inside getPdf: requestMap {}" + requestMap);
+
+        try {
+
+            byte[] byteArray = new byte[0];
+            if (!requestMap.containsKey("uuid") && validateRequestMap(requestMap)) {
+                return new ResponseEntity<>(byteArray, HttpStatus.BAD_REQUEST);
+            }
+
+            String filePath = CafeConstants.STORE_LOCATION + "\\" + requestMap.get("uuid") + ".pdf";
+
+
+            if (CafeUtils.isFileExist(filePath)) {
+
+                byteArray = getByteArray(filePath);
+
+                return new ResponseEntity<>(byteArray, HttpStatus.OK);
+            } else {
+                requestMap.put("isGenerate", false);
+
+                generateReport(requestMap);
+
+                byteArray = getByteArray(filePath);
+
+                return new ResponseEntity<>(byteArray, HttpStatus.OK);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteBill(Long id) {
+
+        try {
+
+            Optional optional = billDao.findById(id);
+
+            if (optional.isPresent()) {
+                billDao.deleteById(id);
+
+                return CafeUtils.getResponseEntity("Bill deleted successfully", HttpStatus.OK);
+            } else {
+                return CafeUtils.getResponseEntity("Bill id does not exist", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private byte[] getByteArray(String filePath) throws Exception {
+
+        File initialFile = new File(filePath);
+        InputStream targetStream = new FileInputStream(initialFile);
+
+        byte[] byteArray = IOUtils.toByteArray(targetStream);
+
+        targetStream.close();
+        return byteArray;
     }
 
     private void addRows(PdfPTable table, Map<String, Object> data) {
@@ -191,19 +265,19 @@ public class BillServiceImpl implements BillService {
         }
     }
 
-    private void insertBill(Map<String, String> requestMap) {
+    private void insertBill(Map<String, Object> requestMap) {
 
 
         try {
 
             Bill bill = new Bill();
             bill.setUuid((String) requestMap.get("uuid"));
-            bill.setName(requestMap.get("name"));
-            bill.setEmail(requestMap.get("email"));
-            bill.setContactNumber(requestMap.get("contactNumber"));
+            bill.setName((String) requestMap.get("name"));
+            bill.setEmail((String) requestMap.get("email"));
+            bill.setContactNumber((String) requestMap.get("contactNumber"));
             bill.setPaymentMethod("paymentMethod");
             bill.setTotal(Integer.parseInt((String) requestMap.get("totalAmount")));
-            bill.setProductDetail(requestMap.get("productDetails"));
+            bill.setProductDetail((String) requestMap.get("productDetails"));
             bill.setCreatedBy(jwtAuthFilter.getCurrentUser());
 
             billDao.save(bill);
@@ -215,7 +289,7 @@ public class BillServiceImpl implements BillService {
     }
 
 
-    private boolean validateRequestMap(Map<String, String> requestMap) {
+    private boolean validateRequestMap(Map<String, Object> requestMap) {
 
         return requestMap.containsKey("name") &&
                 requestMap.containsKey("contactNumber") &&
@@ -224,4 +298,6 @@ public class BillServiceImpl implements BillService {
                 requestMap.containsKey("productDetails") &&
                 requestMap.containsKey("totalAmount");
     }
+
+
 }
