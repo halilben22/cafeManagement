@@ -3,18 +3,22 @@ package com.halildev.cafeManagement.utils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+@Slf4j
 public class CafeUtils {
 
     private CafeUtils() {
@@ -57,5 +61,26 @@ public class CafeUtils {
             }.getType());
         }
         return new HashMap<>();
+    }
+
+
+    public static Boolean isFileExist(String path){
+
+      log.info("inside isFileExist {}"+path);
+
+
+      try {
+
+          File file=new File(path);
+          return file!=null&&file.exists()?Boolean.TRUE:Boolean.FALSE;
+
+      }
+
+      catch (Exception e){
+
+          e.printStackTrace();
+      }
+
+      return false;
     }
 }

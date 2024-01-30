@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class BillRestImpl implements BillRest {
 
 
     @Override
-    public ResponseEntity<String> generateReport(Map<String, String> requestMap) {
+    public ResponseEntity<String> generateReport(Map<String, Object> requestMap) {
 
         try {
 
@@ -53,6 +54,34 @@ public class BillRestImpl implements BillRest {
         }
 
 
-        return CafeUtils.getResponseEntityAsList(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return CafeUtils.getResponseEntityAsList(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getPdf(Map<String, Object> requestMap) {
+        try {
+            return billService.getPdf(requestMap);
+        } catch (Exception e) {
+
+
+        }
+
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteBill(Long id) {
+        try {
+
+            return billService.deleteBill(id);
+
+        }
+
+        catch (Exception e){
+
+            e.printStackTrace();
+        }
+
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG,HttpStatus.OK);
     }
 }
