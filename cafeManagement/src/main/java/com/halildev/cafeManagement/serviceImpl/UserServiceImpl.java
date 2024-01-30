@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
                 return new ResponseEntity<>(userDao.getAllUser(), HttpStatus.OK);
             } else {
 
-                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+                return CafeUtils.getResponseEntityAsList(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
             }
 
         } catch (Exception e) {
@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
 
-        return new ResponseEntity<List<UserWrapper>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return CafeUtils.getResponseEntityAsList(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override

@@ -60,6 +60,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     }
 
+
+    //CHECKING AUTHORIZE WITHIN ADMIN AND USER
     public boolean isAdmin() {
 
         return "admin".equalsIgnoreCase((String) claims.get("role"));
@@ -70,7 +72,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return "user".equalsIgnoreCase((String) claims.get("role"));
     }
 
-
+    //GETTING CURRENT USERNAME
     public String getCurrentUser(){
         return userName;
     }

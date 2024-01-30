@@ -9,4 +9,7 @@ public class CafeConstants {
     public static final String ADMIN_APPROVAL = "Wait for admin approval";
     public static final String BAD_CREDENTIALS ="Bad credentials!" ;
     public static final String UNAUTHORIZED_REQUEST = "Unauthorized request!";
+
+public static final String STORE_LOCATION="C:\\Users\\halil\\Desktop\\PDFLER";
+
 }

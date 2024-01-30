@@ -70,7 +70,7 @@ public class CategoryServiceImpl implements CategoryService {
             e.printStackTrace();
         }
 
-        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return CafeUtils.getResponseEntityAsList(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
